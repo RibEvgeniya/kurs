@@ -31,6 +31,12 @@ async def create_client(
             phone=client.phone,
             email=client.email,
             hashed_password=client.password,
+            polis=client.polis,
+            adress=client.adress,
+            birthdate=client.birthdate,
+            gender=client.gender,
+            region_id=client.region_id
+
         )
 
         return new_client

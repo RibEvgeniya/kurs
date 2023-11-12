@@ -55,3 +55,24 @@ class PatientUpdate(schemas.BaseUserUpdate):
     polis: Optional[str]=None
     # med_data:str
     # med_data_id: int
+
+
+
+
+class RegionShow(BaseModel):
+    id: int
+    area: str
+
+    class Config:
+        orm_mode = True
+
+
+
+class RegionCreate(BaseModel):
+    area: str
+
+
+
+class RegionUpdate(BaseModel):
+    area: str | None
+

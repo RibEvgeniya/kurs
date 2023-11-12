@@ -3,6 +3,7 @@ import asyncio
 
 from fastapi_users import FastAPIUsers
 from routers.pacient import pacient_router
+from routers.region import region_router
 from db.models import Patient
 from db.Manager import get_user_manager
 from auth import auth_backend
@@ -14,6 +15,7 @@ app=FastAPI()
 
 
 app.include_router(pacient_router, prefix="/patients", tags=["patients"])
+app.include_router(region_router, prefix="/region", tags=["region"])
 
 
 

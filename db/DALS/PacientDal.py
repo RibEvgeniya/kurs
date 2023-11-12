@@ -8,10 +8,8 @@ from db.models import Patient
 
 class PacientDAL:
     """Data Access Layer for operating clients info"""
-
     def __init__(self, session: AsyncSession):
         self.session = session
-
     async def create_client(
         self,
         first_name: str,
@@ -22,9 +20,11 @@ class PacientDAL:
         hashed_password: str,
         polis: str,
         adress: str,
+        gender: str,
+        region_id:int,
         birthdate: datetime.date,
         is_active: bool = True,
-        is_verifield: bool = True,
+        is_verified: bool = True,
         is_superuser: bool = False,
     ) -> Patient:
         new_client = Patient(
@@ -38,8 +38,10 @@ class PacientDAL:
             polis=polis,
             adress=adress,
             birthdate=birthdate,
-            is_verifield=is_verifield,
-            is_superuser=is_superuser
+            is_verified=is_verified,
+            is_superuser=is_superuser,
+            gender=gender,
+            region_id=region_id
         )
         self.session.add(new_client)
         await self.session.flush()
