@@ -1,4 +1,6 @@
 import datetime
+from enum import Enum
+
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable, SQLAlchemyBaseUserTableUUID
 from sqlalchemy import String, Boolean,Float, Integer, Column, Text, ForeignKey, DateTime, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
@@ -22,6 +24,7 @@ class Employee(SQLAlchemyBaseUserTable[int],Base):
     region_id: Mapped[int] = mapped_column(ForeignKey("region.id"))
     birthdate: Mapped[datetime.date] = mapped_column(nullable=False)
     salary: Mapped[float] = mapped_column(nullable=False)
+    education: Mapped[str] = mapped_column(String(length=320), unique=True, index=True, nullable=False)
 
 class Region(Base):
     __tablename__ = "region"
@@ -34,9 +37,9 @@ class Specialisation(Base):
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     employees: Mapped[list[Employee]] = relationship(back_populates="specialisation")
     oklad: Mapped[float] = mapped_column(nullable=False)
+    procedure_id: Mapped[int] = mapped_column(ForeignKey("procedure.id"))
 
-
-class Patient(SQLAlchemyBaseUserTable[int], Base):
+class Patient(SQLAlchemyBaseUserTable[int],Base):
     __tablename__ = "patient"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     first_name: Mapped[str] = mapped_column(String(75), nullable=False)
@@ -51,10 +54,9 @@ class Patient(SQLAlchemyBaseUserTable[int], Base):
     birthdate:Mapped[datetime.date]=mapped_column(nullable=False)
     polis: Mapped[str] = mapped_column(String(75), nullable=False)
     adress: Mapped[str] = mapped_column(String(75), nullable=False)
-    med_data: Mapped["Med_data"]=relationship()
-    med_data_id: Mapped[int] = mapped_column(ForeignKey("med_data.id"))
+    ##med_data: Mapped["Med_data"]=relationship()
+    ##med_data_id: Mapped[int] = mapped_column(ForeignKey("med_data.id"))
     gender: Mapped[str] = mapped_column(String(10), nullable=False)
-    snils: Mapped[str] = mapped_column(String(20), nullable=False)
     region_id: Mapped[int] = mapped_column(ForeignKey("region.id"))
 
 class Med_data(Base):
@@ -79,12 +81,19 @@ class Hronolog_illness(Base):
 
 
 class Photo(Base):
-    __tablename__ = "photos"
+    __tablename__ = "photo"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     desc: Mapped[str] = mapped_column(String(200), nullable=True)
     rentgen: Mapped[str] = mapped_column(String(20), nullable=True)
     EKG: Mapped[str] = mapped_column(String(20), nullable=True)
     fluragraf: Mapped[str] = mapped_column(String(20), nullable=True)
+
+class Blank(Base):
+    __tablename__ = "blank"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    desc: Mapped[str] = mapped_column(String(200), nullable=True)
+    type: Mapped[str] = mapped_column(String(20), nullable=True)
+    blank: Mapped[str] = mapped_column(String(20), nullable=True)
 
 class Analysis(Base):
     __tablename__="analysis"
@@ -98,7 +107,8 @@ class Analysis(Base):
     pat_id: Mapped[int] = mapped_column(ForeignKey("patient.id"))
     ##photo_id: Mapped[int] = mapped_column(ForeignKey("photos.id"))
     desc: Mapped[str] = mapped_column(String(200), nullable=True)
-
+    photo_id: Mapped[int] = mapped_column(ForeignKey("photo.id"))
+    pat_id: Mapped[int] = mapped_column(ForeignKey("patient.id"))
 
 
 class Illness(Base):
@@ -107,7 +117,8 @@ class Illness(Base):
     name: Mapped[str] = mapped_column(String(20), nullable=True)
     desc: Mapped[str] = mapped_column(String(200), nullable=True)
     symptoms: Mapped[str] = mapped_column(String(200), nullable=True)
-
+    MKB10_code: Mapped[str] = mapped_column(String(10), nullable=True)
+    treatment: Mapped[str] = mapped_column(String(200), nullable=True)
 
 class Medicine(Base):
     __tablename__ = "medicine"
@@ -115,12 +126,16 @@ class Medicine(Base):
     name: Mapped[str] = mapped_column(String(20), nullable=True)
     desc: Mapped[str] = mapped_column(String(1000), nullable=True)
     contraindications: Mapped[str] = mapped_column(String(1000), nullable=True)
+    producer: Mapped[str] = mapped_column(String(50), nullable=True)
+    release_form: Mapped[str] = mapped_column(String(1000), nullable=True)
 
 class Procedure(Base):
     __tablename__ = "procedure"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String(75), nullable=True)
     desc: Mapped[str] = mapped_column(String(1000), nullable=True)
+    indications: Mapped[str] = mapped_column(String(1000), nullable=True)
+    contraindications: Mapped[str] = mapped_column(String(1000), nullable=True)
     price: Mapped[float] = mapped_column(nullable=True)
 
 
@@ -131,7 +146,7 @@ class Examination(Base):
     desc: Mapped[str] = mapped_column(String(1000), nullable=True)
     ##adress: Mapped[int] = mapped_column(ForeignKey("patient.adress"))  можно достать через ай ди пациента через результат
     result_id: Mapped[int] = mapped_column(ForeignKey("result.id"))
-
+    diagnos_id: Mapped[int] = mapped_column(ForeignKey("diagnos.id"))
 class Diagnos(Base):
     __tablename__ = "diagnos"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -146,7 +161,7 @@ class Result(Base):
     emp_id: Mapped[int] = mapped_column(ForeignKey("employee.id"))
     diag_id: Mapped[int] = mapped_column(ForeignKey("diagnos.id"))
     proc_id:  Mapped[int] = mapped_column(ForeignKey("procedure.id"))
-
+    res_price: Mapped[float] = mapped_column(nullable=True)
 
 
 
@@ -156,6 +171,7 @@ class Reception(Base):
     is_open: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     pat_id: Mapped[int] = mapped_column(ForeignKey("patient.id"))
     desc: Mapped[str] = mapped_column(String(200), nullable=True)
+
 
 
 class Schedule(Base):
@@ -185,3 +201,38 @@ class Pat_Diag(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     pat_id: Mapped[int] = mapped_column(ForeignKey("patient.id"))
     diag_id: Mapped[int] = mapped_column(ForeignKey("diagnos.id"))
+
+
+
+
+
+class PermissionsEnum(Enum):
+    EMPLOYEES_CREATE = "employees:create"
+    EMPLOYEES_READ = "employees:read"
+    EMPLOYEES_UPDATE = "employees:update"
+    EMPLOYEES_DELETE = "employees:delete"
+
+    PATIENT_CREATE = "clients:create"
+    PATIENT_READ = "clients:read"
+    PATIENT_UPDATE = "clients:update"
+    PATIENT_DELETE = "clients:delete"
+
+    BOOKING_CREATE = "booking:create"
+    BOOKING_READ = "booking:read"
+    BOOKING_UPDATE = "booking:update"
+    BOOKING_DELETE = "booking:delete"
+
+    SERVICES_CREATE = "services:create"
+    SERVICES_READ = "services:read"
+    SERVICES_UPDATE = "services:update"
+    SERVICES_DELETE = "services:delete"
+
+    ROOMS_CREATE = "rooms:create"
+    ROOMS_READ = "rooms:read"
+    ROOMS_UPDATE = "rooms:update"
+    ROOMS_DELETE = "rooms:delete"
+
+    SERVICE_ORDERS_CREATE = "service_orders:create"
+    SERVICE_ORDERS_READ = "service_orders:read"
+    SERVICE_ORDERS_UPDATE = "service_orders:update"
+    SERVICE_ORDERS_DELETE = "service_orders:delete"

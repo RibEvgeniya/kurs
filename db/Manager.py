@@ -11,7 +11,10 @@ from schemas import PatientCreate
 SECRET = "SECRET"
 
 
-class UserManager(IntegerIDMixin, BaseUserManager[Patient, uuid.UUID]):
+
+
+
+class UserManager(IntegerIDMixin, BaseUserManager[Patient, int]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
@@ -51,13 +54,12 @@ class UserManager(IntegerIDMixin, BaseUserManager[Patient, uuid.UUID]):
     ):
         print(f"User {user.id} has been updated with {update_dict}.")
 
-
     async def create(
             self,
             user_create: schemas.UC,
             safe: bool = False,
             request: Optional[Request] = None,
-    ) -> models.UP:
+    ) -> schemas.U: ## здесь было через модел что-то
         await self.validate_password(user_create.password, user_create)
 
         existing_user = await self.user_db.get_by_email(user_create.email)
@@ -72,6 +74,7 @@ class UserManager(IntegerIDMixin, BaseUserManager[Patient, uuid.UUID]):
         ##user_dict["is_verified"]=True
         password = user_dict.pop("password")
         user_dict["hashed_password"] = self.password_helper.hash(password)
+        ##user_dict[""] =
         ##user_dict["role_id"] = 1
 
         created_user = await self.user_db.create(user_dict)
@@ -80,3 +83,5 @@ class UserManager(IntegerIDMixin, BaseUserManager[Patient, uuid.UUID]):
 
         return created_user
 
+async def get_user_manager(user_db=Depends(get_user_db)):
+    yield UserManager(user_db)

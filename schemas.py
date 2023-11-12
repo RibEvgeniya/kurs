@@ -18,6 +18,10 @@ class PatientRead(schemas.BaseUser[int]): ## стоит смотреть в ис
     birthdate: datetime.date
     phone: str
     polis:str
+    adress:str
+    gender: str
+    region_id: int
+    ##hashed_password: str
     class Config:
         orm_mode = True
 
@@ -34,6 +38,11 @@ class PatientCreate(schemas.BaseUserCreate):
     birthdate: datetime.date
     phone: str
     polis:str
+    adress: str
+    region_id:int
+    # med_data:str
+    # med_data_id: int
+    gender: str
 
 class PatientUpdate(schemas.BaseUserUpdate):
     password: Optional[str] = None
@@ -41,6 +50,8 @@ class PatientUpdate(schemas.BaseUserUpdate):
     is_active: Optional[bool] = None
     is_superuser: Optional[bool] = None
     is_verified: Optional[bool] = True
-    birthdate: Optional[datetime.date]
+    birthdate: Optional[datetime.date]=None
     phone: Optional[str ]=None
     polis: Optional[str]=None
+    # med_data:str
+    # med_data_id: int

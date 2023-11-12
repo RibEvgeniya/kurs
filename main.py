@@ -4,7 +4,7 @@ import asyncio
 from fastapi_users import FastAPIUsers
 from routers.pacient import pacient_router
 from db.models import Patient
-from db.database import get_user_manager
+from db.Manager import get_user_manager
 from auth import auth_backend
 from schemas import PatientCreate, PatientRead, PatientUpdate
 
@@ -32,7 +32,7 @@ app.include_router(
 
 
 app.include_router(
-    fastapi_users.get_register_router(PatientRead,PatientCreate),
+    fastapi_users.get_register_router(PatientRead, PatientCreate),
     prefix="/auth",
     tags=["auth"],
 )

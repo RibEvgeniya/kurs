@@ -30,5 +30,4 @@ async def get_user_db(session: AsyncSession = Depends(get_db_session)):
 
 
 from db.Manager import UserManager
-async def get_user_manager(user_db=Depends(get_user_db)):
-    yield UserManager(user_db)
+

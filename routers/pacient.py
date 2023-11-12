@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends,HTTPException
 
 from schemas import PatientRead, PatientCreate,PatientUpdate
-from db.PacientDal import PacientDAL
+from db.DALS.PacientDal import PacientDAL
 from db.database import AsyncSession, get_db_session
 
 

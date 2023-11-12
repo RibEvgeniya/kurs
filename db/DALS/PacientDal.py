@@ -2,6 +2,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
+import datetime
 from db.models import Patient
 
 
@@ -19,7 +20,12 @@ class PacientDAL:
         phone: str,
         email: str,
         hashed_password: str,
+        polis: str,
+        adress: str,
+        birthdate: datetime.date,
         is_active: bool = True,
+        is_verifield: bool = True,
+        is_superuser: bool = False,
     ) -> Patient:
         new_client = Patient(
             first_name=first_name,
@@ -29,6 +35,11 @@ class PacientDAL:
             email=email,
             hashed_password=hashed_password,
             is_active=is_active,
+            polis=polis,
+            adress=adress,
+            birthdate=birthdate,
+            is_verifield=is_verifield,
+            is_superuser=is_superuser
         )
         self.session.add(new_client)
         await self.session.flush()
@@ -46,12 +57,9 @@ class PacientDAL:
         return deleted_user_id
 
     async def get_client_by_id(
-        self, client_id: int, include_his_room_orders: bool = False
+        self, client_id: int
     ) -> Patient | None:
         query = select(Patient).where(Patient.id == client_id)
-
-        if include_his_room_orders:
-            query.options(joinedload(Patient.room_orders))
 
         res = await self.session.execute(query)
         client = res.scalar_one_or_none()
@@ -68,7 +76,6 @@ class PacientDAL:
     ) -> list[Patient]:
         query = (
             select(Patient)
-            .options(joinedload(Patient.room_orders))
             .offset(offset)
             .limit(limit)
         )
